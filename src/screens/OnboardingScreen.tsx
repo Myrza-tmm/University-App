@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
+  FlatList,
+  Dimensions,
+  Animated,
 } from 'react-native';
+
+const { width } = Dimensions.get('window');
 
 const COLORS = {
   bg: '#F9F9F5',
@@ -23,19 +28,84 @@ type Props = {
   onSkip: () => void;
 };
 
+const SLIDES = [
+  {
+    id: '1',
+    title1: 'Better way to learning',
+    title2: 'is calling you!',
+    subtitle: 'Unlock Your Potential, Embrace Education',
+  },
+  {
+    id: '2',
+    title1: 'Find yourself by doing',
+    title2: 'whatever you do!',
+    subtitle: 'Education with Grace and Style',
+  },
+  {
+    id: '3',
+    title1: "it's not just learning,",
+    title2: "it's a promise!",
+    subtitle: 'Learn Today, Lead Tomorrow',
+  },
+];
+
 export default function OnboardingScreen({ onNext, onSkip }: Props) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const flatListRef = useRef<FlatList>(null);
+
+  const handleNext = () => {
+    if (currentIndex < SLIDES.length - 1) {
+      flatListRef.current?.scrollToIndex({ index: currentIndex + 1, animated: true });
+    } else {
+      onNext();
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <ProgressBar activeIndex={0} />
+      {/* ЖОҒАРЫДАҒЫ ЖЫЛЖИТЫН СЫЗЫҚ - СУРЕТТЕГІДЕЙ */}
+      <View style={styles.progressContainer}>
+        <Animated.View
+          style={[
+            styles.progressFill,
+            {
+              width: scrollX.interpolate({
+                inputRange: [0, width * (SLIDES.length - 1)],
+                outputRange: ['33%', '100%'],
+                extrapolate: 'clamp',
+              }),
+            },
+          ]}
+        />
+      </View>
 
-      <Illustration />
+      <FlatList
+        ref={flatListRef}
+        data={SLIDES}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+          { useNativeDriver: false }
+        )}
+        onMomentumScrollEnd={(e) => {
+          const index = Math.round(e.nativeEvent.contentOffset.x / width);
+          setCurrentIndex(index);
+        }}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.slide}>
+            <Illustration />
+            <Text style={styles.title}>{item.title1}</Text>
+            <Text style={styles.title}>{item.title2}</Text>
+            <Text style={styles.subtitle}>{item.subtitle}</Text>
+          </View>
+        )}
+      />
 
-      <Title />
-      <Subtitle />
-
-      <View style={styles.spacer} />
-
-      <NextButton onPress={onNext} />
+      <NextButton onPress={handleNext} />
       <SkipButton onPress={onSkip} />
 
       <View style={styles.bottomSpace} />
@@ -43,46 +113,9 @@ export default function OnboardingScreen({ onNext, onSkip }: Props) {
   );
 }
 
-function ProgressBar({ activeIndex }: { activeIndex: number }) {
-  return (
-    <View style={styles.progressContainer}>
-      {[0, 1, 2].map((i) => (
-        <View
-          key={i}
-          style={[
-            styles.progressBar,
-            i === activeIndex && styles.progressActive,
-          ]}
-        />
-      ))}
-    </View>
-  );
-}
-
-function Title() {
-  return (
-    <>
-      <Text style={styles.title}>Better way to learning</Text>
-      <Text style={styles.title}>is calling you!</Text>
-    </>
-  );
-}
-
-function Subtitle() {
-  return (
-    <Text style={styles.subtitle}>
-      Unlock Your Potential, Embrace Education
-    </Text>
-  );
-}
-
 function NextButton({ onPress }: { onPress: () => void }) {
   return (
-    <TouchableOpacity
-      style={styles.nextButton}
-      onPress={onPress}
-      activeOpacity={0.8}
-    >
+    <TouchableOpacity style={styles.nextButton} onPress={onPress} activeOpacity={0.8}>
       <Text style={styles.nextText}>Next</Text>
     </TouchableOpacity>
   );
@@ -96,10 +129,10 @@ function SkipButton({ onPress }: { onPress: () => void }) {
   );
 }
 
+// Сенің Illustration-ың - тиіспедім
 function Illustration() {
   return (
     <View style={styles.illustration}>
-      
       <View style={[styles.blob, styles.blobPurple]} />
       <View style={[styles.blob, styles.blobPink]} />
       <View style={[styles.blob, styles.blobBlue]} />
@@ -118,19 +151,16 @@ function Illustration() {
               <Text style={styles.megaphoneText}>📣</Text>
             </View>
           </View>
-
           <View style={styles.iconsRow}>
             <Text style={styles.icon}>💬</Text>
             <Text style={styles.icon}>✉️</Text>
             <Text style={styles.icon}>🖼️</Text>
           </View>
-
           <View style={styles.iconsRow2}>
             <Text style={styles.icon}>❤️</Text>
             <Text style={styles.icon}>🎥</Text>
           </View>
         </View>
-
         <View style={styles.monitorStand} />
         <View style={styles.monitorBase} />
       </View>
@@ -145,7 +175,6 @@ function Illustration() {
         <Text style={styles.smallIcon}>✉️</Text>
         <Text style={styles.smallIcon}>🔵</Text>
       </View>
-
       <Text style={styles.cursor}>👆🏻</Text>
     </View>
   );
@@ -158,25 +187,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 16,
   },
-  spacer: {
-    flex: 1,
+  slide: {
+    width: width - 48, // paddingHorizontal 24 + 24 ескерілді
   },
   bottomSpace: {
     height: 18,
   },
 
+  // ЖОҒАРЫДАҒЫ СЫЗЫҚ - ЕНДІ БІР ЖОЛАҚ, ІШІНДЕ ЖЫЛЖИТЫН ТОЛТЫРМА
   progressContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  progressBar: {
-    flex: 1,
     height: 3,
     backgroundColor: COLORS.line,
     borderRadius: 2,
+    overflow: 'hidden',
   },
-  progressActive: {
+  progressFill: {
+    height: 3,
     backgroundColor: COLORS.primary,
+    borderRadius: 2,
   },
 
   title: {
@@ -245,7 +273,6 @@ const styles = StyleSheet.create({
     left: 30,
     bottom: 10,
   },
-
   person: {
     position: 'absolute',
     alignItems: 'center',
@@ -282,7 +309,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: -2,
   },
-
   monitor: {
     width: 230,
     alignItems: 'center',
@@ -309,7 +335,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.dark,
     borderRadius: 4,
   },
-
   megaphoneWrap: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -335,7 +360,6 @@ const styles = StyleSheet.create({
   megaphoneText: {
     fontSize: 30,
   },
-
   iconsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
