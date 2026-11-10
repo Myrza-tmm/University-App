@@ -3,9 +3,10 @@ import SplashScreen from './src/screens/SplashScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
+import LoginScreen2 from './src/screens/LoginScreen2';
 
 export default function App() {
-  const [screen, setScreen] = useState<'splash' | 'onboarding' | 'login' | 'register'>('splash');
+  const [screen, setScreen] = useState<'splash' | 'onboarding' | 'login2' | 'login' | 'register'>('splash');
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -19,12 +20,19 @@ export default function App() {
     return <SplashScreen />;
   }
 
+  if (screen === 'login2') {
+    return (
+      <LoginScreen2 onSignUpEmail={() => setScreen ('register')} onSignIn={() => setScreen('login')}
+      onGoogle={() => console.log('Google')} onFacebook={() => console.log('Facebook')}/>
+    );
+  }
+
   if (screen === 'login') {
     return <LoginScreen onLogin={() => console.log('Логин басылды')} onSignUp={() => setScreen('register')}/>
   }
 
   if (screen === 'register') {
-    return <RegisterScreen onRegister={() => console.log('Регистрация басылды')} onBack={() => setScreen('login')}/>
+    return <RegisterScreen onRegister={() => console.log('Регистрация басылды')} onBack={() => setScreen('login2')}/>
   }
 
   return (
