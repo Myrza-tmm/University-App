@@ -4,9 +4,10 @@ import OnboardingScreen from './src/screens/OnboardingScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import LoginScreen2 from './src/screens/LoginScreen2';
+import HomeScreen from './src/screens/HomeScreen';
 
 export default function App() {
-  const [screen, setScreen] = useState<'splash' | 'onboarding' | 'login2' | 'login' | 'register'>('splash');
+  const [screen, setScreen] = useState<'splash' | 'onboarding' | 'login2' | 'login' | 'register' | 'home'>('splash');
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -28,11 +29,15 @@ export default function App() {
   }
 
   if (screen === 'login') {
-    return <LoginScreen onLogin={() => console.log('Логин басылды')} onSignUp={() => setScreen('register')}/>
+    return <LoginScreen onLogin={() => setScreen('home')} onSignUp={() => setScreen('register')}/>
   }
 
   if (screen === 'register') {
-    return <RegisterScreen onRegister={() => console.log('Регистрация басылды')} onBack={() => setScreen('login2')}/>
+    return <RegisterScreen onRegister={() => setScreen('home')} onBack={() => setScreen('login2')}/>
+  }
+
+  if (screen === 'home') {
+    return <HomeScreen />
   }
 
   return (
