@@ -40,6 +40,22 @@ const news = [
     },
 ];
 
+const events = [
+    { id: '1',
+        title: 'Science Fair',
+        date: 'May 15',
+        dateColor: '#E6F0FF',
+        desc: `Annual Science Fair will be held in the main auditorium.`
+    },
+
+    { id: '2',
+        title: 'Sports Day',
+        date: 'May 02',
+        dateColor: '#FF0D6',
+        desc: `Join us for Sports Day!`
+    },
+];
+
 export default function HomeScreen({ onTab }: any) {
     const [tab, setTab] = useState('News');
 
@@ -95,9 +111,16 @@ export default function HomeScreen({ onTab }: any) {
                             News
                         </Text>
                     </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => setTab('Events')}>
+                        <Text style={[styles.tabText, tab === 'Events' && styles.tabActive]}>
+                            Events
+                        </Text>
+                    </TouchableOpacity>
                 </View>
 
-                {news.map((n) => (
+
+                {tab === 'News' && news.map((n) => (
                     <View key={n.id} style={styles.newsCard}>
                         <View style={styles.rowBetween}>
                             <Text style={styles.newsTitle}>
@@ -113,6 +136,24 @@ export default function HomeScreen({ onTab }: any) {
 
                         <Text style={styles.newsDesc}>
                             {n.desc}
+                        </Text>
+                    </View>
+                ))}
+
+                {tab === 'Events' && events.map((e) => (
+                    <View key={e.id} style={styles.newsCard}>
+                        <View style={styles.rowBetween}>
+                            <Text style={styles.newsTitle}>
+                                {e.title}
+                            </Text>
+                            <View style={[styles.dateBadge, {backgroundColor: e.dateColor}]}>
+                                <Text style={styles.dateText}>
+                                    {e.date}
+                                </Text>
+                            </View>
+                        </View>
+                        <Text style={styles.newsDesc}>
+                            {e.desc}
                         </Text>
                     </View>
                 ))}
