@@ -6,9 +6,10 @@ import RegisterScreen from './src/screens/RegisterScreen';
 import LoginScreen2 from './src/screens/LoginScreen2';
 import HomeScreen from './src/screens/HomeScreen';
 import CoursesScreen from './src/screens/CoursesScreen';
+import SheduleScreen from './src/screens/SheduleScreen';
 
 export default function App() {
-  const [screen, setScreen] = useState<'splash' | 'onboarding' | 'login2' | 'login' | 'register' | 'home' | 'courses'>('splash');
+  const [screen, setScreen] = useState<'splash' | 'onboarding' | 'login2' | 'login' | 'register' | 'home' | 'courses' | 'shedule'>('splash');
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -43,6 +44,10 @@ export default function App() {
 
   if (screen === 'courses') {
     return <CoursesScreen onTab={(tab: string) => setScreen(tab as any)} />
+  }
+
+  if (screen === 'shedule') {
+    return <SheduleScreen onTab={(tab: string) => setScreen(tab as any )} />
   }
 
   return (

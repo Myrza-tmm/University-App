@@ -84,7 +84,7 @@ export default function CoursesScreen({ onTab }: any) {
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.bottomItem}>
+                <TouchableOpacity style={styles.bottomItem} onPress={() => onTab?.('shedule')}>
                     <EvilIcons name="calendar" size={24} color="black" />
                     <Text style={styles.bottomLabel}>
                         Shedule
