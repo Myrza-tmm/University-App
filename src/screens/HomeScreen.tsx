@@ -188,7 +188,7 @@ export default function HomeScreen({ onTab }: any) {
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.bottomItem}>
+                <TouchableOpacity style={styles.bottomItem} onPress={() => onTab?.('profile')}>
                     <AntDesign name="user" size={24} color="#666" />
                     <Text style={styles.bottomLabel}>
                         Profile
