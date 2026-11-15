@@ -171,7 +171,7 @@ export default function SheduleScreen({ onTab }: any) {
                     </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.bottomItem}>
+                <TouchableOpacity style={styles.bottomItem} onPress={() => onTab?.('result')}>
                     <Entypo name="graduation-cap" size={24} color="black" />
                     <Text style={styles.bottomLabel}>
                         Result
