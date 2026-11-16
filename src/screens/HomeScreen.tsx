@@ -1,43 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import Entypo from '@expo/vector-icons/Entypo';
-import EvilIcons from '@expo/vector-icons/EvilIcons';
-import Feather from '@expo/vector-icons/Feather';
+import { AntDesign, Entypo, EvilIcons, Feather } from '@expo/vector-icons';
+import { ActivityIndicator } from 'react-native';
+import { useNews } from '../hooks/useNews';
+import NewsCard from '../components/NewsCard';
+import { RefreshControl } from 'react-native';
 
 const categories = [
     { id: '1', title: 'Computer\nScience', color: '#2B4EFF', emoji: '💻' },
     { id: '2', title: 'Mathematics', color: '#2E7D32', emoji: '📐' },
     { id: '3', title: 'History &\nGeography', color: '#E8963A', emoji: '🌍' },
     { id: '4', title: 'Art& \nCraft', color: '#E84A8A', emoji: '🎨' },
-];
-
-const news = [
-    { id: '1', 
-        title: 'FBISE', 
-        date: 'May 01', 
-        dateColor: '#F5E6E6', 
-        desc: `The Federal Board 
-        of Intermediate and Secondary Education (FBISE) has officially announced the date for 
-        the results of the Secondary School Certificate (SSC) Part I & II 1st Annual Examinations.`
-    },
-    
-    { id: '2',
-        title: 'Gaza',
-        date: 'June 07',
-        dateColor: '#E6F0D6',
-        desc: `The Pakistan Medical and Dental Council (PM&DC) 
-            has permitted medical/dental students from Gaza to 
-            complete their studies in Pakistan.`
-    },
-
-    { id: '3',
-        title: 'LUMS',
-        date: 'May 01',
-        dateColor: '#D6E6F5',
-        desc: `LUMS recently celebrated the graduation 
-        of its new batch of students with great enthusiasm.`
-    },
 ];
 
 const events = [
@@ -58,15 +31,20 @@ const events = [
 
 export default function HomeScreen({ onTab }: any) {
     const [tab, setTab] = useState('News');
+    const { data: newsData, status: newsStatus, refreshing, refresh } = useNews();
+    
 
     return (
         <View style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{paddingBottom: 100}}>
+            <ScrollView 
+            showsVerticalScrollIndicator={false} 
+            contentContainerStyle={{paddingBottom: 100}}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} colors={['#A64B8C']} /> }>
                 <Text style={styles.header}>
                     Home
                 </Text>
 
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catRow}>
+                <ScrollView horizontal nestedScrollEnabled={true} showsHorizontalScrollIndicator={false} style={styles.catRow}>
                     {categories.map((c) => (
                         <TouchableOpacity key={c.id} style={[styles.catCard, {backgroundColor: c.color }]}>
                             <Text style={styles.catEmoji}>
@@ -120,25 +98,15 @@ export default function HomeScreen({ onTab }: any) {
                 </View>
 
 
-                {tab === 'News' && news.map((n) => (
-                    <View key={n.id} style={styles.newsCard}>
-                        <View style={styles.rowBetween}>
-                            <Text style={styles.newsTitle}>
-                                {n.title}
-                            </Text>
-
-                            <View style={[styles.dateBadge, {backgroundColor: n.dateColor}]}>
-                                <Text style={styles.dateText}>
-                                    {n.date}
-                                </Text>
-                            </View>
-                        </View>
-
-                        <Text style={styles.newsDesc}>
-                            {n.desc}
-                        </Text>
-                    </View>
-                ))}
+                {tab === 'News' && (
+                    <>
+                      {newsStatus === 'loading' && <ActivityIndicator size="large" color="A64B8C" style={{ marginTop: 20 }} />}
+                      {newsStatus === 'error' && <Text style={{ textAlign: 'center', marginTop: 20 }}>Жаңалық жүктелмеді</Text>}
+                      {newsStatus === 'success' && (newsData || []).map((item: any) => (
+                        <NewsCard key={item.id} item={item} />
+                      ))}
+                    </>
+                )}
 
                 {tab === 'Events' && events.map((e) => (
                     <View key={e.id} style={styles.newsCard}>
